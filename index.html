@@ -4,43 +4,109 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>3 Galibiyet</title>
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#0f172a">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .completed-text { text-decoration: line-through; opacity: 0.5; color: #94a3b8; }
+        .win-input { transition: all 0.3s ease; }
+        .win-card { transition: transform 0.2s; }
+        .win-card:active { transform: scale(0.98); }
+    </style>
 </head>
-<body class="bg-slate-900 text-white flex flex-col items-center p-6 font-sans touch-none">
+<body class="bg-[#0f172a] text-white flex flex-col items-center p-6 font-sans min-h-screen">
 
-    <header class="text-center mb-8 pt-4">
-        <h1 class="text-2xl font-bold text-cyan-400">Günün 3 Galibiyeti</h1>
-        <p class="text-slate-400 text-xs">Bugünü kazanmak için 3 adım.</p>
+    <header class="text-center mb-8 pt-8">
+        <h1 class="text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+            3 GALİBİYET
+        </h1>
+        <div id="date-display" class="text-slate-500 text-xs mt-1 uppercase tracking-widest"></div>
     </header>
 
-    <div class="w-full max-w-md space-y-4">
-        <input type="text" id="w1" placeholder="1. Hedef" class="w-full bg-slate-800 p-4 rounded-2xl border border-slate-700 focus:border-cyan-500 outline-none transition-all">
-        <input type="text" id="w2" placeholder="2. Hedef" class="w-full bg-slate-800 p-4 rounded-2xl border border-slate-700 focus:border-cyan-500 outline-none transition-all">
-        <input type="text" id="w3" placeholder="3. Hedef" class="w-full bg-slate-800 p-4 rounded-2xl border border-slate-700 focus:border-cyan-500 outline-none transition-all">
-        
-        <button onclick="kaydet()" class="w-full bg-cyan-600 py-4 rounded-2xl font-bold active:scale-95 transition-transform shadow-lg shadow-cyan-900/40">
-            Hedefleri Kilitle
-        </button>
+    <div class="w-full max-w-sm bg-slate-800 h-2 rounded-full mb-8 overflow-hidden">
+        <div id="progress-bar" class="bg-cyan-500 h-full w-0 transition-all duration-500 shadow-[0_0_10px_rgba(6,182,212,0.5)]"></div>
     </div>
 
+    <div class="w-full max-w-sm space-y-4" id="app">
+        <div class="win-card flex items-center bg-slate-800/40 border border-slate-700 p-2 rounded-2xl group">
+            <input type="text" id="t1" placeholder="1. Hedef..." class="win-input flex-1 bg-transparent p-3 outline-none border-none">
+            <button onclick="toggle(1)" class="w-12 h-12 flex items-center justify-center rounded-xl bg-slate-700/50 text-xl" id="b1">○</button>
+        </div>
+
+        <div class="win-card flex items-center bg-slate-800/40 border border-slate-700 p-2 rounded-2xl group">
+            <input type="text" id="t2" placeholder="2. Hedef..." class="win-input flex-1 bg-transparent p-3 outline-none border-none">
+            <button onclick="toggle(2)" class="w-12 h-12 flex items-center justify-center rounded-xl bg-slate-700/50 text-xl" id="b2">○</button>
+        </div>
+
+        <div class="win-card flex items-center bg-slate-800/40 border border-slate-700 p-2 rounded-2xl group">
+            <input type="text" id="t3" placeholder="3. Hedef..." class="win-input flex-1 bg-transparent p-3 outline-none border-none">
+            <button onclick="toggle(3)" class="w-12 h-12 flex items-center justify-center rounded-xl bg-slate-700/50 text-xl" id="b3">○</button>
+        </div>
+    </div>
+
+    <p class="text-[10px] text-slate-600 mt-auto pb-4 italic">Otomatik kaydedilir ve her gün sıfırlanır.</p>
+
     <script>
-        function kaydet() {
-            const d = { 1:document.getElementById('w1').value, 2:document.getElementById('w2').value, 3:document.getElementById('w3').value, date: new Date().toDateString() };
-            localStorage.setItem('wins', JSON.stringify(d));
-            alert('Başarılar, hedefler kaydedildi!');
-        }
-        window.onload = () => {
-            const s = JSON.parse(localStorage.getItem('wins'));
-            if(s && s.date === new Date().toDateString()) {
-                document.getElementById('w1').value = s[1];
-                document.getElementById('w2').value = s[2];
-                document.getElementById('w3').value = s[3];
+        let state = {
+            date: new Date().toDateString(),
+            wins: { 1: {t:'', c:false}, 2: {t:'', c:false}, 3: {t:'', c:false} }
+        };
+
+        function init() {
+            const saved = JSON.parse(localStorage.getItem('daily_wins_v2'));
+            const today = new Date().toDateString();
+            document.getElementById('date-display').innerText = today;
+
+            if (saved && saved.date === today) {
+                state = saved;
+            } else {
+                localStorage.removeItem('daily_wins_v2'); // Eski günü temizle
             }
+            render();
         }
+
+        function render() {
+            let doneCount = 0;
+            [1, 2, 3].forEach(i => {
+                const input = document.getElementById(`t${i}`);
+                const btn = document.getElementById(`b${i}`);
+                input.value = state.wins[i].t;
+                
+                if (state.wins[i].c) {
+                    input.classList.add('completed-text');
+                    btn.innerText = '●';
+                    btn.classList.replace('bg-slate-700/50', 'bg-cyan-600');
+                    doneCount++;
+                } else {
+                    input.classList.remove('completed-text');
+                    btn.innerText = '○';
+                    btn.classList.replace('bg-cyan-600', 'bg-slate-700/50');
+                }
+            });
+
+            // Progress Bar Güncelle
+            document.getElementById('progress-bar').style.width = (doneCount / 3 * 100) + '%';
+            
+            // Veriyi kaydet
+            localStorage.setItem('daily_wins_v2', JSON.stringify(state));
+        }
+
+        function toggle(i) {
+            state.wins[i].t = document.getElementById(`t${i}`).value;
+            if(!state.wins[i].t) return; // Boşsa işlem yapma
+            state.wins[i].c = !state.wins[i].c;
+            render();
+        }
+
+        // Yazarken kaydetme (input takibi)
+        [1,2,3].forEach(i => {
+            document.getElementById(`t${i}`).addEventListener('input', (e) => {
+                state.wins[i].t = e.target.value;
+                localStorage.setItem('daily_wins_v2', JSON.stringify(state));
+            });
+        });
+
+        init();
     </script>
 </body>
 </html>
