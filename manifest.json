@@ -1,0 +1,15 @@
+{
+  "name": "3 Galibiyet",
+  "short_name": "3Galibiyet",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#06b6d4",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/190/190411.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
