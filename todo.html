@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>3 Galibiyet</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-white flex flex-col items-center p-6 font-sans touch-none">
+
+    <header class="text-center mb-8 pt-4">
+        <h1 class="text-2xl font-bold text-cyan-400">Günün 3 Galibiyeti</h1>
+        <p class="text-slate-400 text-xs">Bugünü kazanmak için 3 adım.</p>
+    </header>
+
+    <div class="w-full max-w-md space-y-4">
+        <input type="text" id="w1" placeholder="1. Hedef" class="w-full bg-slate-800 p-4 rounded-2xl border border-slate-700 focus:border-cyan-500 outline-none transition-all">
+        <input type="text" id="w2" placeholder="2. Hedef" class="w-full bg-slate-800 p-4 rounded-2xl border border-slate-700 focus:border-cyan-500 outline-none transition-all">
+        <input type="text" id="w3" placeholder="3. Hedef" class="w-full bg-slate-800 p-4 rounded-2xl border border-slate-700 focus:border-cyan-500 outline-none transition-all">
+        
+        <button onclick="kaydet()" class="w-full bg-cyan-600 py-4 rounded-2xl font-bold active:scale-95 transition-transform shadow-lg shadow-cyan-900/40">
+            Hedefleri Kilitle
+        </button>
+    </div>
+
+    <script>
+        function kaydet() {
+            const d = { 1:document.getElementById('w1').value, 2:document.getElementById('w2').value, 3:document.getElementById('w3').value, date: new Date().toDateString() };
+            localStorage.setItem('wins', JSON.stringify(d));
+            alert('Başarılar, hedefler kaydedildi!');
+        }
+        window.onload = () => {
+            const s = JSON.parse(localStorage.getItem('wins'));
+            if(s && s.date === new Date().toDateString()) {
+                document.getElementById('w1').value = s[1];
+                document.getElementById('w2').value = s[2];
+                document.getElementById('w3').value = s[3];
+            }
+        }
+    </script>
+</body>
+</html>
